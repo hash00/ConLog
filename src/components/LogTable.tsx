@@ -102,7 +102,7 @@ function FilterPopover({ col, values, selected, text, onValues, onText, onClose 
 
   const sel = new Set(selected)
   const shown = q ? values.filter(x => x.v.toLowerCase().includes(q.toLowerCase())) : values
-  const toggle = (v: string) => { const n = new Set(sel); n.has(v) ? n.delete(v) : n.add(v); onValues([...n]) }
+  const toggle = (v: string) => { const n = new Set(sel); if (n.has(v)) n.delete(v); else n.add(v); onValues([...n]) }
   return (
     <div ref={ref} className="absolute top-full left-0 mt-1 bg-panel border border-border rounded-lg shadow-2xl z-30 p-2 flex flex-col"
       style={{ width: 280, resize: 'both', overflow: 'hidden', minWidth: 220, minHeight: 200, maxWidth: 640 }}
@@ -211,7 +211,7 @@ export function LogTable({ entries, isStream = false, onPidClick, persist = fals
 
   const toggleBookmark = useCallback((e: LogEntry) => {
     setBookmarks(prev => {
-      const next = new Set(prev); const k = bmKey(e); next.has(k) ? next.delete(k) : next.add(k)
+      const next = new Set(prev); const k = bmKey(e); if (next.has(k)) next.delete(k); else next.add(k)
       try { localStorage.setItem(BM_KEY, JSON.stringify([...next])) } catch { /* ignore */ }
       return next
     })
