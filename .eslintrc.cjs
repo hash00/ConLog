@@ -15,6 +15,11 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    // React Compiler-readiness rule (added in eslint-plugin-react-hooks v7);
+    // this project doesn't use the Compiler, and it flags the standard
+    // "reset state, then kick off an async load" effect pattern used
+    // throughout src/components as an error.
+    'react-hooks/set-state-in-effect': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },

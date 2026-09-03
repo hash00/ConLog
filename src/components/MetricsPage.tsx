@@ -47,6 +47,27 @@ const Tip = ({
   )
 }
 
+function SortTh({ label, k, align = 'right', cls = '', sortKey, sortDir, onToggle }: {
+  label: string
+  k: keyof ProcRow
+  align?: 'left' | 'right'
+  cls?: string
+  sortKey: keyof ProcRow | null
+  sortDir: 'asc' | 'desc'
+  onToggle: (k: keyof ProcRow) => void
+}) {
+  return (
+    <th
+      onClick={() => onToggle(k)}
+      className={`${align === 'left' ? 'text-left' : 'text-right'} py-2 px-3 font-medium cursor-pointer select-none hover:text-body ${sortKey === k ? 'text-accent' : ''} ${cls}`}
+    >
+      <span className="inline-flex items-center gap-1">{label}
+        {sortKey === k && (sortDir === 'asc' ? <ArrowUp size={11} /> : <ArrowDown size={11} />)}
+      </span>
+    </th>
+  )
+}
+
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return <div className={`bg-panel border border-border rounded-xl p-4 ${className}`}>{children}</div>
 }
@@ -153,16 +174,7 @@ export function MetricsPage({ entries, loading, onOpenProcess }: MetricsPageProp
   const axisTick = { fontSize: 10, fill: c.axis }
   const catTick = { fontSize: 10, fill: c.legend }
 
-  const SortTh = ({ label, k, align = 'right', cls = '' }: { label: string; k: keyof ProcRow; align?: 'left' | 'right'; cls?: string }) => (
-    <th
-      onClick={() => toggle(k)}
-      className={`${align === 'left' ? 'text-left' : 'text-right'} py-2 px-3 font-medium cursor-pointer select-none hover:text-body ${sortKey === k ? 'text-accent' : ''} ${cls}`}
-    >
-      <span className="inline-flex items-center gap-1">{label}
-        {sortKey === k && (sortDir === 'asc' ? <ArrowUp size={11} /> : <ArrowDown size={11} />)}
-      </span>
-    </th>
-  )
+  const sortThProps = { sortKey, sortDir, onToggle: toggle } as const
 
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -197,14 +209,14 @@ export function MetricsPage({ entries, loading, onOpenProcess }: MetricsPageProp
             <table className="w-full text-xs">
               <thead className="sticky top-0 bg-panel z-10">
                 <tr className="border-b border-border text-dim uppercase tracking-wider text-[10px]">
-                  <SortTh label="Process" k="name" align="left" />
-                  <SortTh label="PID" k="pid" />
-                  <SortTh label="Run as" k="isRoot" />
-                  <SortTh label="Faults" k="faults" cls="text-fault" />
-                  <SortTh label="Errors" k="errors" cls="text-error" />
-                  <SortTh label="Debug" k="debug" cls="text-debug" />
-                  <SortTh label="Total" k="total" />
-                  <SortTh label="Error %" k="ratio" />
+                  <SortTh label="Process" k="name" align="left" {...sortThProps} />
+                  <SortTh label="PID" k="pid" {...sortThProps} />
+                  <SortTh label="Run as" k="isRoot" {...sortThProps} />
+                  <SortTh label="Faults" k="faults" cls="text-fault" {...sortThProps} />
+                  <SortTh label="Errors" k="errors" cls="text-error" {...sortThProps} />
+                  <SortTh label="Debug" k="debug" cls="text-debug" {...sortThProps} />
+                  <SortTh label="Total" k="total" {...sortThProps} />
+                  <SortTh label="Error %" k="ratio" {...sortThProps} />
                 </tr>
               </thead>
               <tbody>
