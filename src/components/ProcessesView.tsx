@@ -11,6 +11,23 @@ interface ProcessesViewProps {
 
 type Row = ProcessListItem & { logs: number }
 
+function Th({ label, k, align = 'right', mode, sortKey, dir, onToggle }: {
+  label: string
+  k: keyof Row
+  align?: 'left' | 'right'
+  mode: 'list' | 'tree'
+  sortKey: keyof Row | null
+  dir: 'asc' | 'desc'
+  onToggle: (k: keyof Row) => void
+}) {
+  return (
+    <th onClick={() => mode === 'list' && onToggle(k)}
+      className={`${align === 'left' ? 'text-left' : 'text-right'} py-2 px-3 font-medium whitespace-nowrap ${mode === 'list' ? 'cursor-pointer hover:text-body' : ''} ${sortKey === k && mode === 'list' ? 'text-accent' : ''}`}>
+      <span className="inline-flex items-center gap-1">{label}{mode === 'list' && sortKey === k && (dir === 'asc' ? <ArrowUp size={11} /> : <ArrowDown size={11} />)}</span>
+    </th>
+  )
+}
+
 export function ProcessesView({ entries, onOpenProcess }: ProcessesViewProps) {
   const [procs, setProcs] = useState<ProcessListItem[]>([])
   const [loading, setLoading] = useState(false)
@@ -78,12 +95,7 @@ export function ProcessesView({ entries, onOpenProcess }: ProcessesViewProps) {
     return out
   }, [mode, procs, search, runAs, matchesFilter])
 
-  const Th = ({ label, k, align = 'right' }: { label: string; k: keyof Row; align?: 'left' | 'right' }) => (
-    <th onClick={() => mode === 'list' && toggle(k)}
-      className={`${align === 'left' ? 'text-left' : 'text-right'} py-2 px-3 font-medium whitespace-nowrap ${mode === 'list' ? 'cursor-pointer hover:text-body' : ''} ${key === k && mode === 'list' ? 'text-accent' : ''}`}>
-      <span className="inline-flex items-center gap-1">{label}{mode === 'list' && key === k && (dir === 'asc' ? <ArrowUp size={11} /> : <ArrowDown size={11} />)}</span>
-    </th>
-  )
+  const thProps = { mode, sortKey: key, dir, onToggle: toggle } as const
 
   const renderRow = (p: Row | ProcessListItem, depth = 0) => {
     const logs = 'logs' in p ? p.logs : (logCounts.get(p.pid) ?? 0)
@@ -134,10 +146,10 @@ export function ProcessesView({ entries, onOpenProcess }: ProcessesViewProps) {
         <table className="w-full text-xs">
           <thead className="sticky top-0 bg-void z-10">
             <tr className="border-b border-border text-dim uppercase tracking-wider text-[10px]">
-              <Th label={mode === 'tree' ? 'Process tree' : 'Process'} k="name" align="left" />
-              <Th label="PID" k="pid" /><Th label="User" k="user" align="left" />
-              <Th label="% CPU" k="cpu" /><Th label="% Mem" k="mem" /><Th label="Memory" k="rss" />
-              <Th label="State" k="stat" align="left" /><Th label="Run as" k="isRoot" /><Th label="Log entries" k="logs" />
+              <Th label={mode === 'tree' ? 'Process tree' : 'Process'} k="name" align="left" {...thProps} />
+              <Th label="PID" k="pid" {...thProps} /><Th label="User" k="user" align="left" {...thProps} />
+              <Th label="% CPU" k="cpu" {...thProps} /><Th label="% Mem" k="mem" {...thProps} /><Th label="Memory" k="rss" {...thProps} />
+              <Th label="State" k="stat" align="left" {...thProps} /><Th label="Run as" k="isRoot" {...thProps} /><Th label="Log entries" k="logs" {...thProps} />
             </tr>
           </thead>
           <tbody>

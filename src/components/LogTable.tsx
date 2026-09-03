@@ -289,6 +289,8 @@ export function LogTable({ entries, isStream = false, onPidClick, persist = fals
 
   const parentRef = useRef<HTMLDivElement>(null)
   const followRef = useRef(true)
+  // TanStack Virtual's returned functions are documented as stable; this is the library's normal API shape.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: sorted.length,
     getScrollElement: () => parentRef.current,
